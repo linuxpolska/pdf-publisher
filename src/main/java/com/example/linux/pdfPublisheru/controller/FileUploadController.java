@@ -1,98 +1,166 @@
 package com.example.linux.pdfPublisheru.controller;
 
-import com.example.linux.pdfPublisheru.exception.StorageFileNotFoundException;
-import com.example.linux.pdfPublisheru.service.StorageService;
-import org.springframework.core.io.Resource;
+import com.example.linux.pdfPublisheru.dto.ResponseDTO;
+import com.example.linux.pdfPublisheru.publisher.PdfReportPublisher;
+import com.example.linux.pdfPublisheru.settings.DestinationProperties;
+import com.example.linux.pdfPublisheru.settings.SourceProperties;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import okhttp3.*;
+import okhttp3.RequestBody;
+import org.apache.commons.io.IOUtils;
+import org.sonar.api.ce.posttask.PostProjectAnalysisTask;
+import org.sonar.api.ce.posttask.QualityGate;
+import org.sonar.api.utils.log.Logger;
+import org.sonar.api.utils.log.Loggers;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.io.IOException;
-import java.net.URL;
+import java.io.*;
+import java.nio.file.NoSuchFileException;
 import java.time.Clock;
 import java.time.Instant;
-import java.util.stream.Collectors;
 
 @Controller
-public class FileUploadController {
+public class FileUploadController implements PostProjectAnalysisTask {
+    // logger
+    private static final Logger LOGGER = Loggers.get(FileUploadController.class);
+    private Response response = null;
 
-    private final StorageService storageService;
+    ObjectMapper objectMapper = new ObjectMapper();
 
     @Autowired
-    public FileUploadController(StorageService storageService) {
-        this.storageService = storageService;
+    public FileUploadController() {
     }
 
-    @GetMapping("/fileStorage")
-    public String listUploadedFiles(Model model) throws IOException {
-
-        model.addAttribute("files", storageService.loadAll().map(
-                        path -> MvcUriComponentsBuilder.fromMethodName(FileUploadController.class,
-                                "serveFile",
-                                generateFileName(path.getFileName().toString())).build().toUri().toString())
-                .collect(Collectors.toList()));
-
-        return "uploadForm";
+    @Override
+    public void finished(ProjectAnalysis analysis) {
+        QualityGate gate = analysis.getQualityGate();
+        analysis.getScannerContext().getProperties().get(DestinationProperties.HELLO_KEY);
+        if (gate != null) {
+            Loggers.get(getClass()).info("Quality gate is " + gate.getStatus());
+        }
+        try {
+            System.out.println("Test");
+        } catch (Exception e) {
+        }
     }
 
-    //TODO do wywalenia
-    @GetMapping("/files/{filename:.+}")
-    @ResponseBody
-    public ResponseEntity<Resource> serveFile(@PathVariable String filename) {
 
-        Resource file = storageService.loadAsResource(filename);
-        return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,
-                "attachment; filename=\"" + file.getFilename() + "\"").body(file);
-    }
 //    @PostMapping("/file")
-//    @ResponseBody
-//    public ResponseEntity<Resource> downloadFile(Model model) {
-//        model.addAttribute("files", storageService.loadAll().map(
-//                        path -> MvcUriComponentsBuilder.fromMethodName(FileUploadController.class,
-//                                "serveFile",
-//                                generateFileName(path.getFileName().toString())).build().toUri().toString())
-//                .collect(Collectors.toList()));
-//
-////        Resource file = storageService.loadAsResource(filename);
-//        return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,
-//                "attachment; filename=\"" + ).getFilename() + "\"").body(file);
-//    }
+    public Response handleFileUpload(
+//            @RequestParam("file") MultipartFile file) throws IOException {
+              File file) {
+        try {
+            OkHttpClient client = new OkHttpClient().newBuilder()
+                    .build();
+//            MediaType mediaType = MediaType.parse(DestinationProperties.TEXT_PLAIN); // TODO sprawdzic czy potrzebne
+            RequestBody body = new MultipartBody.Builder().setType(MultipartBody.FORM)
+                    .addFormDataPart(DestinationProperties.FIlE, generateFileName("/D:/Grafiki/SpacesBools06.png"), // TODO - dodaj tutaj nazwe pliku
+                            RequestBody.create(MediaType.parse(DestinationProperties.APPLICATION_OCTET_STREAM),
+//                                    new File("/D:/Grafiki/SpacesBools06.png"))) // TODO - put here body of file
+                                    file))
+                    .addFormDataPart(DestinationProperties.MINOR_EDIT, DestinationProperties.TRUE_TEXT)
+                    .addFormDataPart(DestinationProperties.COMMENT, null,
+                            RequestBody.create(
+                                    MediaType.parse(DestinationProperties.TEXT_PLAIN),
+                                    DestinationProperties.COMMENT_BODY.getBytes()))
+                    .build();
+
+            PdfReportPublisher pdfReportPublisher = new PdfReportPublisher();
+            Request request = pdfReportPublisher.publishPdfToPage(
+                    DestinationProperties.urlDestinationBuilder(),
+                    body);
+            response = client.newCall(request).execute();
+            System.out.println(response.body().toString());
+            ResponseDTO responseDTO = objectMapper.readValue(response.body().toString(), ResponseDTO.class);
+            pdfReportPublisher.checkHttpStatus(response);
+
+//            String responseString = response.body().string();
+//            LOGGER.warn(responseString);
+            LOGGER.warn(String.valueOf(response.code()));
+            if  (responseDTO.getData() == null) {
+                System.out.println("Nulllerfiks");
+                System.out.println("Nulllerfiks");
+            }
+        } catch (NoSuchFileException noSuchFileException) {
+            // TODO stworzyc obiekt zwracany ze jest blad
+            LOGGER.error(DestinationProperties.THE_FIlE + file.getName() + DestinationProperties.DOES_NOT_EXIST);
+            LOGGER.warn(noSuchFileException.getMessage());
+            noSuchFileException.printStackTrace();
+        } catch (Exception e) {
+            LOGGER.error(DestinationProperties.UPLOAD_FILE_ATLASSIAN);
+            LOGGER.warn(e.getMessage());
+            e.printStackTrace();
+        }
+        return response;
+    }
+
 
     @PostMapping("/file")
-    public ResponseEntity<byte[]> handleFileUpload(@RequestParam("file") MultipartFile file,
-                                                   RedirectAttributes redirectAttributes) throws IOException {
-
-        storageService.store(file); // do wywalenia?
-        redirectAttributes.addFlashAttribute("message",
-                "You successfully uploaded " + file.getOriginalFilename() + "!");
-
-//        return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,
-//                "attachment; filename=\"" + file.getName() + "\"").body(file);
-        // Locate file in the cache memory TODO Czy na pewno potrzebuje memory
-        // Send file to the atlassian confluence page
+    public Response testUpload(
+            @RequestParam("file") MultipartFile file) throws IOException {
         try {
-            URL url = new URL("http://"+ ${atlassian.confluence.hostname}+ "localhost:8090/rest/api/content/65603/child/attachment");
-        } catch (IOException e) {
+            OkHttpClient client = new OkHttpClient().newBuilder()
+                    .build();
+            RequestBody body = new MultipartBody.Builder().setType(MultipartBody.FORM)
+                    .addFormDataPart(DestinationProperties.FIlE, generateFileName("/D:/Grafiki/SpacesBools06.png"), // TODO - dodaj tutaj nazwe pliku
+                            RequestBody.create(MediaType.parse(DestinationProperties.APPLICATION_OCTET_STREAM),
+                                    new File("/D:/Grafiki/SpacesBools06.png"))) // TODO - put here body of file
+//                                    file))
+                    .addFormDataPart(DestinationProperties.MINOR_EDIT, DestinationProperties.TRUE_TEXT)
+                    .addFormDataPart(DestinationProperties.COMMENT, null,
+                            RequestBody.create(
+                                    MediaType.parse(DestinationProperties.TEXT_PLAIN),
+                                    DestinationProperties.COMMENT_BODY.getBytes()))
+                    .build();
 
+            PdfReportPublisher pdfReportPublisher = new PdfReportPublisher();
+            Request request = pdfReportPublisher.publishPdfToPage(
+                    DestinationProperties.urlDestinationBuilder(),
+                    body);
+            response = client.newCall(request).execute();
+            System.out.println(response.body().toString());
+//            ResponseDTO responseDTO = objectMapper.readValue(response.body().toString(), ResponseDTO.class);
+            pdfReportPublisher.checkHttpStatus(response);
+
+//            String responseString = response.body().string();
+//            LOGGER.warn(responseString);
+            LOGGER.warn(String.valueOf(response.code()));
+        } catch (NoSuchFileException noSuchFileException) {
+            // TODO stworzyc obiekt zwracany ze jest blad
+            LOGGER.error(DestinationProperties.THE_FIlE + file.getName() + DestinationProperties.DOES_NOT_EXIST);
+            LOGGER.warn(noSuchFileException.getMessage());
+            noSuchFileException.printStackTrace();
+        } catch (Exception e) {
+            LOGGER.error(DestinationProperties.UPLOAD_FILE_ATLASSIAN);
+            LOGGER.warn(e.getMessage());
+            e.printStackTrace();
         }
-        return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,
-                "attachment; filename=\"" + file.getOriginalFilename() + "\"")
-                .body(file.getBytes());
-    }
-
-    @ExceptionHandler(StorageFileNotFoundException.class)
-    public ResponseEntity<?> handleStorageFileNotFound(StorageFileNotFoundException exc) {
-        return ResponseEntity.notFound().build();
+        return response;
     }
 
     private String generateFileName(String fileName) {
         Instant currentTimeStamp = Clock.systemUTC().instant();
-        return fileName+=currentTimeStamp;
+        // TODO timestap_nazwa-repo_nazwa_pliku
+        return currentTimeStamp + "_" +  fileName.substring(0, 0)  +  fileName.substring(0);
     }
+
+    // TODO wywalic
+//    FileOutputStream strumieńWyjściowy = new FileOutputStream(response.body().bytes());
+//
+//    // In
+//    InputStream in = response.body().byteStream();
+//    // Out
+//    FileOutputStream out = new FileOutputStream(
+//            new File(Environment.getExternalStorageDirectory(), "test.epub"));
+//            IOUtils.copy(in, out);
+//    byte[] pdfBytes = response.body().bytes();
+//    ByteArrayInputStream bin = new ByteArrayInputStream(pdfBytes);
+//    //File where you want to write the pdf and update some content
+//    File file = new File("Data.pdf");
+
+//            File file = new File(response.body().bytes());
 }
