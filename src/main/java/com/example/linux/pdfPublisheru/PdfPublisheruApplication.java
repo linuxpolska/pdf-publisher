@@ -1,7 +1,6 @@
 package com.example.linux.pdfPublisheru;
 
 import com.example.linux.pdfPublisheru.publisher.FileStorageProperties;
-import com.example.linux.pdfPublisheru.service.StorageProperties;
 import com.example.linux.pdfPublisheru.service.StorageService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -11,7 +10,7 @@ import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
 @EnableConfigurationProperties({
-		FileStorageProperties.class, StorageProperties.class
+		FileStorageProperties.class
 })
 public class PdfPublisheruApplication {
 
@@ -20,10 +19,10 @@ public class PdfPublisheruApplication {
 	}
 
 	@Bean
-	CommandLineRunner init(StorageService storageService) {
+	CommandLineRunner init() {
 		return (args) -> {
-			storageService.deleteAll();
-			storageService.init();
+//			storageService.deleteAll(); // TODO co to jest?
+//			storageService.init();
 		};
 	}
 }

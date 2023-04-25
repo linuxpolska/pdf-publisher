@@ -1,6 +1,6 @@
 package com.example.linux.pdfPublisheru.publisher;
 
-public class ConfulenceAuthentication {
+public class ConfluenceAuthentication {
 
 
     String userName = "user";
