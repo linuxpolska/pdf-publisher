@@ -10,7 +10,12 @@ import java.util.List;
 import static java.util.Arrays.asList;
 
 public class PdfPublisherProperties {
-    public PdfPublisherProperties() {}
+    /*
+    Empty constructor
+    */
+    public PdfPublisherProperties() {
+        // Only for initialization
+    }
     private static final Logger LOGGER = Loggers.get(PdfPublisherProperties.class);
     public static final String DOT_EXTENSION = ".pdf";
     public static final String CATEGORY_PDF_PUBLISHER_PROPERTIES = "Pdf Publisher Properties";
@@ -90,7 +95,7 @@ public class PdfPublisherProperties {
     public static final Boolean FALSE_VALUE = false;
     // Error MGMT
     public static final String FIlE = "file";
-    public static final String THE_FIlE = "The file";
+    public static final String THE = "The ";
     public static final String UPLOAD_FILE_ATLASSIAN = "Occurred error during uploading file to the "
             + PdfPublisherProperties.getProperties().get(4).name() + " website of atlassian in pageId: " +
             PdfPublisherProperties.getProperties().get(8).name();
@@ -103,7 +108,7 @@ public class PdfPublisherProperties {
         }
         LOGGER.info("Port number is: " + sourcePort);
         LOGGER.info("Branch name is : " + branch);
-        StringBuffer stringBuilder = new StringBuffer()
+        StringBuilder stringBuilder = new StringBuilder()
                 .append(hostname_source);
         if (sourcePort != null) {
             stringBuilder
@@ -157,7 +162,8 @@ public class PdfPublisherProperties {
                         .name("SonarQube login")
                         .description("Login of sonarqube server account")
                         .defaultValue("SonarQube login")
-                        .type(PropertyType.USER_LOGIN)
+//                        .type(PropertyType.USER_LOGIN)
+                        .type(PropertyType.STRING)
                         .category(CATEGORY_PDF_PUBLISHER_PROPERTIES)
                         .build(),
                 PropertyDefinition.builder(PDF_PUBLISHER_SONARQUBE_PASSWORD)  // 3
@@ -184,7 +190,8 @@ public class PdfPublisherProperties {
                         .name("Confluence login")
                         .description("Login of confluence server account")
                         .defaultValue("Confluence login")
-                        .type(PropertyType.USER_LOGIN)
+//                        .type(PropertyType.USER_LOGIN)
+                        .type(PropertyType.STRING)
                         .category(CATEGORY_PDF_PUBLISHER_PROPERTIES)
                         .build(),
                 PropertyDefinition.builder(PDF_PUBLISHER_CONFLUENCE_PASSWORD) // 7

@@ -17,16 +17,13 @@ import java.time.Instant;
 public class FileUploadController implements PostProjectAnalysisTask {
     // logger
     private static final Logger LOGGER = Loggers.get(FileUploadController.class);
-    private Response response = null;
 
-    public FileUploadController() {}
-
-    @Override
-    public void finished(ProjectAnalysis analysis) {
+    public FileUploadController() {
+        // Only for initialization
     }
 
-
     public void handleFileUpload(File file, PdfPublisherProperties destinationProperties) {
+        Response response = null;
         try {
             OkHttpClient client = new OkHttpClient().newBuilder()
                     .build();
@@ -51,12 +48,16 @@ public class FileUploadController implements PostProjectAnalysisTask {
                     destinationProperties.getLoginConfluence(),
                     destinationProperties.getPasswordConfluence());
             response = client.newCall(request).execute();
-            System.out.println(response.body().toString());
+            LOGGER.info(response.body().toString());
             pdfErrorManagement.checkHttpStatus(response);
-
             LOGGER.warn(String.valueOf(response.code()));
         } catch (NoSuchFileException noSuchFileException) {
-            LOGGER.error(PdfPublisherProperties.THE_FIlE + file.getName() + PdfPublisherProperties.DOES_NOT_EXIST);
+            LOGGER.error(
+                    PdfPublisherProperties.THE +
+                            PdfPublisherProperties.SPACE +
+                            PdfPublisherProperties.FIlE +
+                            file.getName() +
+                            PdfPublisherProperties.DOES_NOT_EXIST);
             LOGGER.warn(noSuchFileException.getMessage());
             noSuchFileException.printStackTrace();
         } catch (Exception e) {
