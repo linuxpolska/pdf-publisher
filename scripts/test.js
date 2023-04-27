@@ -16,15 +16,24 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import React from 'react';
-import '../style.css';
-import PdfPublisherStatisticsApp from './components/PdfPublisherStatisticsApp';
+process.env.NODE_ENV = 'test';
+process.env.PUBLIC_URL = '';
 
-// This creates a global administration page, which generates a report of the
-// overall number of Quality Profiles, Quality Gates, total number of issues,
-// and total number of projects.
-//
-// You can access it at /admin/extension/example/admin_page
-window.registerExtension('pdfpublisher/projectpage', () => {
-  return <PdfPublisherStatisticsApp />
-});
+// Load environment variables from .env file. Surpress warnings using silent
+// if this file is missing. dotenv will never modify any environment variables
+// that have already been set.
+// https://github.com/motdotla/dotenv
+require('dotenv').config({ silent: true });
+
+const jest = require('jest');
+
+const argv = process.argv.slice(2);
+
+// Watch unless on CI
+if (!process.env.CI) {
+  argv.push('--watch');
+}
+
+argv.push('--coverage');
+
+jest.run(argv);

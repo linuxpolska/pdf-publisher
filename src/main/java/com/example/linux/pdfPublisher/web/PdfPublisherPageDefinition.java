@@ -1,0 +1,22 @@
+package com.example.linux.pdfPublisher.web;
+
+import org.sonar.api.web.page.Context;
+import org.sonar.api.web.page.Page;
+import org.sonar.api.web.page.PageDefinition;
+
+import static org.sonar.api.web.page.Page.Qualifier.*;
+import static org.sonar.api.web.page.Page.Scope.COMPONENT;
+
+public class PdfPublisherPageDefinition implements PageDefinition {
+
+    @Override
+    public void define(Context context) {
+        context
+                .addPage(Page.builder("pdfpublisher/projectpage")
+                        .setName("PDF Publisher Plugin Page")
+                        .setAdmin(true) // Only admin can adjust properties on this page
+//                        .setScope(COMPONENT) // The page would be added to a project, application, or portfolio menu
+//                        .setComponentQualifiers(PROJECT) // What kind of component the page applies to
+                        .build());
+    }
+}
