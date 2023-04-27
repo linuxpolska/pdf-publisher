@@ -139,7 +139,9 @@ public class PdfPublisherProperties {
                     .append(PdfPublisherProperties.EQUAL)
                     .append(projectName);
         }
-        setHostname(hostname_source);
+        setHostnameSonarQube(hostname_source);
+        LOGGER.info("SonarQube url is: ");
+        LOGGER.info(stringBuilder.toString());
         return stringBuilder.toString();
     }
     public static List<PropertyDefinition> getProperties() {
@@ -209,11 +211,11 @@ public class PdfPublisherProperties {
                         .build());
     }
 
-    public void setHostname(String hostnameSource) {
+    public void setHostnameSonarQube(String hostnameSource) {
         this.hostnameSonarQubeSource = hostnameSource;
     }
 
-    public String getHostname() {
+    public String getHostnameSonarQube() {
         return this.hostnameSonarQubeSource;
     }
     public void setProjectSonarQubeName(String projectSonarQubeName) {
@@ -304,7 +306,7 @@ public class PdfPublisherProperties {
     }
 
     public static String urlConfluenceBuilder(String hostnameDestination, String portDestination, String pageId) {
-        return new StringBuffer()
+        String url = new StringBuffer()
                 .append(hostnameDestination)
                 .append(PdfPublisherProperties.DOUBLE_DOTS)
                 .append(portDestination)
@@ -315,5 +317,8 @@ public class PdfPublisherProperties {
                 .append(PdfPublisherProperties.SLASH)
                 .append(PdfPublisherProperties.CHILD_ATTACHMENT)
                 .toString();
+        LOGGER.info("Confluence url: ");
+        LOGGER.info(url);
+        return url;
     }
 }

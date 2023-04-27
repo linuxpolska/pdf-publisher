@@ -6,17 +6,25 @@ import com.example.linux.pdfPublisher.settings.PdfPublisherProperties;
 import okhttp3.*;
 import org.apache.commons.io.FileUtils;
 import org.sonar.api.ce.posttask.PostProjectAnalysisTask;
+import org.sonar.api.config.Configuration;
 import org.sonar.api.utils.log.Logger;
 import org.sonar.api.utils.log.Loggers;
 
 import java.io.*;
 import java.nio.file.NoSuchFileException;
+import java.util.Arrays;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
 public class PostProjectAnalysis implements PostProjectAnalysisTask {
     private static final Logger LOGGER = Loggers.get(PostProjectAnalysis.class);
     private PdfPublisherProperties pdfPublisherProperties = new PdfPublisherProperties();
+
+    private final Configuration configuration;
+
+    public PostProjectAnalysis(Configuration configuration) {
+        this.configuration = configuration;
+    }
 
     @Override
     public String getDescription() {
@@ -26,53 +34,61 @@ public class PostProjectAnalysis implements PostProjectAnalysisTask {
     @Override
     public void finished(Context context) {
         LOGGER.info("Downloading an report of analysis has been submitted.");
-        try {
-            // Gettings values from user interface of plugin
-            //Source Section
-            // Project Name
+        try { // TODO wywalic port ustawienia i zostawic by ustawiali w hostname polu
+            // Getting values from user interface of plugin
+            // SonarQube Section
             pdfPublisherProperties.setProjectSonarQubeName(Optional.ofNullable(
-                    context.getProjectAnalysis().getProject()).map(Object::toString).get());
+                    context.getProjectAnalysis().getProject().getName()).map(Object::toString).get());
             // Branch Name
-            pdfPublisherProperties.setBranchSonarQubeName(Optional.ofNullable(
-                    context.getProjectAnalysis().getBranch()).map(Object::toString).get());
+            LOGGER.info(String.valueOf(Optional.ofNullable(context.getProjectAnalysis().getBranch().get().getName())));
+            pdfPublisherProperties.setBranchSonarQubeName(context.getProjectAnalysis().getBranch().get().getName().map(Object::toString).get());
             // Hostname - Custom
-            pdfPublisherProperties.setHostname(Optional.ofNullable(
-                    context.getProjectAnalysis().getScannerContext().getProperties()
-                            .get(PdfPublisherProperties.PDF_PUBLISHER_SONARQUBE_HOSTNAME)).map(Object::toString).get());
+            pdfPublisherProperties.setHostnameSonarQube(convertStringArrayToString(
+                    Optional.ofNullable(configuration.getStringArray(PdfPublisherProperties.PDF_PUBLISHER_SONARQUBE_HOSTNAME))
+                            .get(),","));
+            LOGGER.info("SonarQube Login "+ pdfPublisherProperties.getHostnameSonarQube());
             // Port - Custom
-            pdfPublisherProperties.setPortSonarQube(Optional.ofNullable(
-                    context.getProjectAnalysis().getScannerContext().getProperties()
-                            .get(PdfPublisherProperties.PDF_PUBLISHER_SONARQUBE_PORT)).map(Object::toString).get());
+            pdfPublisherProperties.setPortSonarQube(convertStringArrayToString(
+                    Optional.ofNullable(configuration.getStringArray(PdfPublisherProperties.PDF_PUBLISHER_SONARQUBE_PORT))
+                            .get(),","));
+            LOGGER.info("SonarQube Port "+ pdfPublisherProperties.getPortSonarQube());
             // Login - Custom
-            pdfPublisherProperties.setLoginSonarQube(Optional.ofNullable(
-                    context.getProjectAnalysis().getScannerContext().getProperties()
-                            .get(PdfPublisherProperties.PDF_PUBLISHER_SONARQUBE_LOGIN)).map(Object::toString).get());
+            pdfPublisherProperties.setLoginSonarQube(convertStringArrayToString(
+                    Optional.ofNullable(configuration.getStringArray(PdfPublisherProperties.PDF_PUBLISHER_SONARQUBE_LOGIN))
+                            .get(),","));
+            LOGGER.info("SonarQube Login "+ !pdfPublisherProperties.getLoginSonarQube().isEmpty());
             // Password - Custom
-            pdfPublisherProperties.setPasswordSonarQube(Optional.ofNullable(
-                    context.getProjectAnalysis().getScannerContext().getProperties()
-                            .get(PdfPublisherProperties.PDF_PUBLISHER_SONARQUBE_PASSWORD)).map(Object::toString).get());
+            pdfPublisherProperties.setPasswordSonarQube(convertStringArrayToString(
+                    Optional.ofNullable(configuration.getStringArray(PdfPublisherProperties.PDF_PUBLISHER_SONARQUBE_PASSWORD))
+                            .get(),","));
+            LOGGER.info("SonarQube Password "+ !pdfPublisherProperties.getPasswordSonarQube().isEmpty());
 
             // Destination section
             // Hostname - Custom
-            pdfPublisherProperties.setHostnameConfluence(Optional.ofNullable(
-                    context.getProjectAnalysis().getScannerContext().getProperties()
-                            .get(PdfPublisherProperties.PDF_PUBLISHER_CONFLUENCE_HOSTNAME)).map(Object::toString).get());
+            pdfPublisherProperties.setHostnameConfluence(convertStringArrayToString(
+                    Optional.ofNullable(configuration.getStringArray(PdfPublisherProperties.PDF_PUBLISHER_CONFLUENCE_HOSTNAME))
+                            .get(),","));
+            LOGGER.info("Confluence Hostname "+ pdfPublisherProperties.getHostnameConfluence());
             // Port - Custom
-            pdfPublisherProperties.setPortConfluence(Optional.ofNullable(
-                    context.getProjectAnalysis().getScannerContext().getProperties()
-                            .get(PdfPublisherProperties.PDF_PUBLISHER_CONFLUENCE_PORT)).map(Object::toString).get());
+            pdfPublisherProperties.setPortConfluence(convertStringArrayToString(
+                    Optional.ofNullable(configuration.getStringArray(PdfPublisherProperties.PDF_PUBLISHER_CONFLUENCE_PORT))
+                            .get(),","));
+            LOGGER.info("Confluence Port "+ pdfPublisherProperties.getPortConfluence());
             // Login - Custom
-            pdfPublisherProperties.setLoginConfluence(Optional.ofNullable(
-                    context.getProjectAnalysis().getScannerContext().getProperties()
-                            .get(PdfPublisherProperties.PDF_PUBLISHER_CONFLUENCE_LOGIN)).map(Object::toString).get());
+            pdfPublisherProperties.setLoginConfluence(convertStringArrayToString(
+                    Optional.ofNullable(configuration.getStringArray(PdfPublisherProperties.PDF_PUBLISHER_CONFLUENCE_LOGIN))
+                            .get(),","));
+            LOGGER.info("Confluence Login "+ !pdfPublisherProperties.getLoginConfluence().isEmpty());
             // Password - Custom
-            pdfPublisherProperties.setPasswordConfluence(Optional.ofNullable(
-                    context.getProjectAnalysis().getScannerContext().getProperties()
-                            .get(PdfPublisherProperties.PDF_PUBLISHER_CONFLUENCE_PASSWORD)).map(Object::toString).get());
+            pdfPublisherProperties.setPasswordConfluence(convertStringArrayToString(
+                    Optional.ofNullable(configuration.getStringArray(PdfPublisherProperties.PDF_PUBLISHER_CONFLUENCE_PASSWORD))
+                            .get(),","));
+            LOGGER.info("Confluence Hostname " + !pdfPublisherProperties.getPasswordConfluence().isEmpty());
             // `PageId - Custom
-            pdfPublisherProperties.setPageIdConfluence(Optional.ofNullable(
-                    context.getProjectAnalysis().getScannerContext().getProperties()
-                            .get(PdfPublisherProperties.PDF_PUBLISHER_CONFLUENCE_PAGEID)).map(Object::toString).get());
+            pdfPublisherProperties.setPageIdConfluence(convertStringArrayToString(
+                    Optional.ofNullable(configuration.getStringArray(PdfPublisherProperties.PDF_PUBLISHER_CONFLUENCE_PAGEID))
+                            .get(),","));
+            LOGGER.info("Confluence PageId "+ pdfPublisherProperties.getPageIdConfluence());
 
             // Destination section
 
@@ -80,14 +96,14 @@ public class PostProjectAnalysis implements PostProjectAnalysisTask {
                 OkHttpClient client = new OkHttpClient().newBuilder()
                         .build();
                 MediaType mediaType = MediaType.parse(PdfPublisherProperties.TEXT_PLAIN);
-                RequestBody body = RequestBody.create(mediaType, "");
+//                RequestBody body = RequestBody.create(mediaType, "");
                 Request request = new Request.Builder()
                         .url(new PdfPublisherProperties().urlSourceBuilder(
                                 pdfPublisherProperties.getHostnameSonarQubeSource(),
                                 pdfPublisherProperties.getPortSonarQube(),
                                 pdfPublisherProperties.getProjectSonarQubeName(),
                                 pdfPublisherProperties.getBranchSonarQubeName()))
-                        .method(PdfPublisherProperties.GET, body)
+                        .method(PdfPublisherProperties.GET, null)
                         .addHeader(PdfPublisherProperties.AUTHORIZATION,
                                 PdfPublisherProperties.BASIC +
                                         PdfPublisherProperties.SPACE +
@@ -125,6 +141,13 @@ public class PostProjectAnalysis implements PostProjectAnalysisTask {
             LOGGER.warn(elementException.getMessage());
             elementException.printStackTrace();
         }
+    }
+
+    private static String convertStringArrayToString(String[] strArr, String delimiter) {
+        StringBuilder sb = new StringBuilder();
+        for (String str : strArr)
+            sb.append(str).append(delimiter);
+        return sb.substring(0, sb.length() - 1);
     }
 }
 
