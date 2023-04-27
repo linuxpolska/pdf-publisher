@@ -1,7 +1,6 @@
 package com.example.linux.pdfPublisher;
 
 import com.example.linux.pdfPublisher.hooks.PostProjectAnalysis;
-import com.example.linux.pdfPublisher.settings.DestinationProperties;
 import com.example.linux.pdfPublisher.settings.PdfPublisherProperties;
 import com.example.linux.pdfPublisher.web.PdfPublisherPageDefinition;
 import org.sonar.api.Plugin;
@@ -15,8 +14,7 @@ public class PdfPlugin implements Plugin {
         // tutorial on hooks
         context.addExtensions(Collections.singleton(PostProjectAnalysis.class));
         // tutorial on settings
-        context.addExtensions(DestinationProperties.getProperties())
-               .addExtensions(PdfPublisherProperties.getProperties());
+        context.addExtensions(PdfPublisherProperties.getProperties());
         // tutorial on web extensions
         context.addExtension(PdfPublisherPageDefinition.class);
     }

@@ -15,8 +15,6 @@ public class PdfPublisherPageDefinition implements PageDefinition {
                 .addPage(Page.builder("pdfpublisher/projectpage")
                         .setName("PDF Publisher Plugin Page")
                         .setAdmin(true) // Only admin can adjust properties on this page
-//                        .setScope(COMPONENT) // The page would be added to a project, application, or portfolio menu
-//                        .setComponentQualifiers(PROJECT) // What kind of component the page applies to
                         .build());
     }
 }
