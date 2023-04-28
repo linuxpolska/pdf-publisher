@@ -2,6 +2,7 @@ package com.example.linux.pdfPublisher.settings;
 
 import org.sonar.api.PropertyType;
 import org.sonar.api.config.PropertyDefinition;
+import org.sonar.api.resources.Qualifiers;
 import org.sonar.api.utils.log.Logger;
 import org.sonar.api.utils.log.Loggers;
 
@@ -16,19 +17,18 @@ public class PdfPublisherProperties {
     public PdfPublisherProperties() {
         // Only for initialization
     }
+
     private static final Logger LOGGER = Loggers.get(PdfPublisherProperties.class);
     public static final String DOT_EXTENSION = ".pdf";
     public static final String CATEGORY_PDF_PUBLISHER_PROPERTIES = "Pdf Publisher Properties";
     // Keys from UI SonarQube
     public static final String PDF_PUBLISHER_SONARQUBE_HOSTNAME = "publisher.sonar.hostname";
-    public static final String PDF_PUBLISHER_SONARQUBE_PORT = "publisher.sonar.port";
     public static final String PDF_PUBLISHER_SONARQUBE_LOGIN = "publisher.sonar.login";
     public static final String PDF_PUBLISHER_SONARQUBE_PASSWORD = "publisher.sonar.password";
 
     // Keys from UI Confluence
     public static final String PDF_PUBLISHER_CONFLUENCE_HOSTNAME = "publisher.confluence.hostname";
-    public static final String PDF_PUBLISHER_CONFLUENCE_PORT = "publisher.confluence.port";
-    public static final String PDF_PUBLISHER_CONFLUENCE_PAGEID = "publisher.confluence.pageid";
+    public static final String PDF_PUBLISHER_CONFLUENCE_PAGEID = "publisher.confluence.page_id";
     public static final String PDF_PUBLISHER_CONFLUENCE_LOGIN = "publisher.confluence.login";
     public static final String PDF_PUBLISHER_CONFLUENCE_PASSWORD = "publisher.confluence.password";
 
@@ -38,23 +38,23 @@ public class PdfPublisherProperties {
     public String hostnameSonarQubeSource;
     public String loginSonarQube;
     public String passwordSonarQube;
-    public String portSonarQube;
 
     public String hostnameConfluence;
     public String loginConfluence;
     public String passwordConfluence;
-    public String portConfluence;
     public String pageIdConfluence;
     public static final String DOUBLE_DOTS = ":";
     public static final String SLASH = "/";
     public static final String API = "api";
     public static final String SECURITY_REPORTS = "security_reports";
     public static final String DOWNLOAD = "download";
+    public static final String COMPONENT = "component";
     public static final String QUESTION_MARK = "?";
     public static final String PROJECT = "project";
     public static final String BRANCH = "branch";
     public static final String EQUAL = "=";
     public static final String AND = "&";
+    public static final String KEYS = "keys";
     // HTTP settings
     public static final String GET = "GET";
     public static final String AUTHORIZATION = "Authorization";
@@ -81,13 +81,13 @@ public class PdfPublisherProperties {
     public static final String TEXT_PLAIN = "text/plain";
     // Authorization
     public static final String REST_API_CONTENT = "rest" + SLASH + "api" + SLASH + "content";
+    public static final String REST_SETTINGS_VALUES = "/api/settings/values";
     public static final String CHILD_ATTACHMENT = "child" + SLASH + "attachment";
     // Request Body
     public static final String TEXT_BODY = "text/plain";
     public static final String MINOR_EDIT = "minorEdit";
     public static final String COMMENT = "comment";
-    public static final String COMMENT_BODY = "Adding report file to the " + PdfPublisherProperties.getProperties().get(4).name()
-            + "on Port: " + PdfPublisherProperties.getProperties().get(5).name();
+    public static final String COMMENT_BODY = "Adding report file to the " + PdfPublisherProperties.getProperties().get(3).name();
     // BOOLEAN
     public static final String TRUE_TEXT = "true";
     public static final Boolean TRUE_VALUE = true;
@@ -97,24 +97,18 @@ public class PdfPublisherProperties {
     public static final String FIlE = "file";
     public static final String THE = "The ";
     public static final String UPLOAD_FILE_ATLASSIAN = "Occurred error during uploading file to the "
-            + PdfPublisherProperties.getProperties().get(4).name() + " website of atlassian in pageId: " +
-            PdfPublisherProperties.getProperties().get(8).name();
+            + PdfPublisherProperties.getProperties().get(3).name() + " website of atlassian in pageId: " +
+            PdfPublisherProperties.getProperties().get(6).name();
 
-    public String urlSourceBuilder(String hostname_source, String sourcePort, String projectName, String branch) {
+    public String urlSourceBuilder(String hostname_source, String projectName, String branch) {
         if (hostname_source == null) {
             LOGGER.warn("Source Hostname is invalid! Please check the configuration.");
         } else if (projectName == null) {
             LOGGER.warn("Value of projectName name is invalid! Please check the configuration.");
         }
-        LOGGER.info("Port number is: " + sourcePort);
         LOGGER.info("Branch name is : " + branch);
         StringBuilder stringBuilder = new StringBuilder()
                 .append(hostname_source);
-        if (sourcePort != null) {
-            stringBuilder
-                    .append(PdfPublisherProperties.DOUBLE_DOTS)
-                    .append(sourcePort);
-        }
         stringBuilder
                 .append(PdfPublisherProperties.SLASH)
                 .append(PdfPublisherProperties.API)
@@ -144,23 +138,18 @@ public class PdfPublisherProperties {
         LOGGER.info(stringBuilder.toString());
         return stringBuilder.toString();
     }
+
     public static List<PropertyDefinition> getProperties() {
 
         return asList(
                 PropertyDefinition.builder(PDF_PUBLISHER_SONARQUBE_HOSTNAME) // 0
                         .name("Sonarqube hostname")
-                        .description("Hostname of source sonarqube server with 'https://www.(...)'")
+                        .description("Hostname of source sonarqube server example 'https://www.hostname:port'")
                         .defaultValue("SonarQube hostname")
                         .type(PropertyType.STRING)
                         .category(CATEGORY_PDF_PUBLISHER_PROPERTIES)
                         .build(),
-                PropertyDefinition.builder(PDF_PUBLISHER_SONARQUBE_PORT)  // 1
-                        .name("Sonarqube port")
-                        .description("Port of source sonarqube server")
-                        .type(PropertyType.INTEGER)
-                        .category(CATEGORY_PDF_PUBLISHER_PROPERTIES)
-                        .build(),
-                PropertyDefinition.builder(PDF_PUBLISHER_SONARQUBE_LOGIN)  // 2
+                PropertyDefinition.builder(PDF_PUBLISHER_SONARQUBE_LOGIN)  // 1
                         .name("SonarQube login")
                         .description("Login of sonarqube server account")
                         .defaultValue("SonarQube login")
@@ -168,27 +157,21 @@ public class PdfPublisherProperties {
                         .type(PropertyType.STRING)
                         .category(CATEGORY_PDF_PUBLISHER_PROPERTIES)
                         .build(),
-                PropertyDefinition.builder(PDF_PUBLISHER_SONARQUBE_PASSWORD)  // 3
+                PropertyDefinition.builder(PDF_PUBLISHER_SONARQUBE_PASSWORD)  // 2
                         .name("SonarQube password")
                         .description("Password of sonarqube server account")
                         .defaultValue("SonarQube password")
                         .type(PropertyType.PASSWORD)
                         .category(CATEGORY_PDF_PUBLISHER_PROPERTIES)
                         .build(),
-                PropertyDefinition.builder(PDF_PUBLISHER_CONFLUENCE_HOSTNAME) // 4
+                PropertyDefinition.builder(PDF_PUBLISHER_CONFLUENCE_HOSTNAME) // 3
                         .name("Confluence hostname")
-                        .description("Hostname of source confluence server with 'https://www.(...)'")
+                        .description("Hostname of source confluence server with 'https://www.hostname:port")
                         .defaultValue("Confluence hostname")
                         .type(PropertyType.STRING)
                         .category(CATEGORY_PDF_PUBLISHER_PROPERTIES)
                         .build(),
-                PropertyDefinition.builder(PDF_PUBLISHER_CONFLUENCE_PORT) // 5
-                        .name("Confluence port")
-                        .description("Port of source confluence server")
-                        .type(PropertyType.INTEGER)
-                        .category(CATEGORY_PDF_PUBLISHER_PROPERTIES)
-                        .build(),
-                PropertyDefinition.builder(PDF_PUBLISHER_CONFLUENCE_LOGIN) // 6
+                PropertyDefinition.builder(PDF_PUBLISHER_CONFLUENCE_LOGIN) // 4
                         .name("Confluence login")
                         .description("Login of confluence server account")
                         .defaultValue("Confluence login")
@@ -196,16 +179,19 @@ public class PdfPublisherProperties {
                         .type(PropertyType.STRING)
                         .category(CATEGORY_PDF_PUBLISHER_PROPERTIES)
                         .build(),
-                PropertyDefinition.builder(PDF_PUBLISHER_CONFLUENCE_PASSWORD) // 7
+                PropertyDefinition.builder(PDF_PUBLISHER_CONFLUENCE_PASSWORD) // 5
                         .name("Confluence password")
                         .description("Password of confluence server account")
                         .defaultValue("Confluence password")
                         .type(PropertyType.PASSWORD)
                         .category(CATEGORY_PDF_PUBLISHER_PROPERTIES)
                         .build(),
-                PropertyDefinition.builder(PDF_PUBLISHER_CONFLUENCE_PAGEID) // 8
+                PropertyDefinition.builder(PDF_PUBLISHER_CONFLUENCE_PAGEID) // 6
                         .name("Confluence pageId")
-                        .description("Page id of confluence server account")
+                        .description("Page id of confluence server account. Go to Confluence Page->" +
+                                "Click on Three Dots-> Page Information->" +
+                                "in the url you will find the PageId parameter values.")
+                        .onlyOnQualifiers(Qualifiers.PROJECT)
                         .type(PropertyType.INTEGER)
                         .category(CATEGORY_PDF_PUBLISHER_PROPERTIES)
                         .build());
@@ -218,9 +204,11 @@ public class PdfPublisherProperties {
     public String getHostnameSonarQube() {
         return this.hostnameSonarQubeSource;
     }
+
     public void setProjectSonarQubeName(String projectSonarQubeName) {
         this.projectSonarQubeName = projectSonarQubeName;
     }
+
     public String getProjectSonarQubeName() {
         return this.projectSonarQubeName;
     }
@@ -257,14 +245,6 @@ public class PdfPublisherProperties {
         this.passwordSonarQube = passwordSonarQube;
     }
 
-    public String getPortSonarQube() {
-        return portSonarQube;
-    }
-
-    public void setPortSonarQube(String portSonarQube) {
-        this.portSonarQube = portSonarQube;
-    }
-
     public String getHostnameConfluence() {
         return hostnameConfluence;
     }
@@ -289,14 +269,6 @@ public class PdfPublisherProperties {
         this.passwordConfluence = passwordConfluence;
     }
 
-    public String getPortConfluence() {
-        return portConfluence;
-    }
-
-    public void setPortConfluence(String portConfluence) {
-        this.portConfluence = portConfluence;
-    }
-
     public String getPageIdConfluence() {
         return pageIdConfluence;
     }
@@ -305,11 +277,9 @@ public class PdfPublisherProperties {
         this.pageIdConfluence = pageIdConfluence;
     }
 
-    public static String urlConfluenceBuilder(String hostnameDestination, String portDestination, String pageId) {
+    public static String urlConfluenceBuilder(String hostnameDestination, String pageId) {
         String url = new StringBuffer()
                 .append(hostnameDestination)
-                .append(PdfPublisherProperties.DOUBLE_DOTS)
-                .append(portDestination)
                 .append(PdfPublisherProperties.SLASH)
                 .append(PdfPublisherProperties.REST_API_CONTENT)
                 .append(PdfPublisherProperties.SLASH)
@@ -318,6 +288,30 @@ public class PdfPublisherProperties {
                 .append(PdfPublisherProperties.CHILD_ATTACHMENT)
                 .toString();
         LOGGER.info("Confluence url: ");
+        LOGGER.info(url);
+        return url;
+    }
+
+    public String urlSourcePageIDBuilder(String hostnameSonarQubeSource, String projectSonarQubeName) {
+        if (hostnameSonarQubeSource == null) {
+            LOGGER.warn("Source Hostname is invalid! Please check the configuration.");
+        } else if (projectSonarQubeName == null) {
+            LOGGER.warn("Value of projectName name is invalid! Please check the configuration.");
+        }
+        String url = new StringBuffer()
+                .append(hostnameSonarQubeSource)
+                .append(PdfPublisherProperties.SLASH)
+                .append(PdfPublisherProperties.REST_SETTINGS_VALUES)
+                .append(PdfPublisherProperties.QUESTION_MARK)
+                .append(PdfPublisherProperties.COMPONENT)
+                .append(PdfPublisherProperties.EQUAL)
+                .append(projectSonarQubeName)
+                .append(PdfPublisherProperties.AND)
+                .append(PdfPublisherProperties.KEYS)
+                .append(PdfPublisherProperties.EQUAL)
+                .append(PdfPublisherProperties.PDF_PUBLISHER_CONFLUENCE_PAGEID)
+                .toString();
+        LOGGER.info("SonarQube PageId url: ");
         LOGGER.info(url);
         return url;
     }

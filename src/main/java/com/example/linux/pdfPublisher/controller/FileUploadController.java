@@ -5,7 +5,6 @@ import com.example.linux.pdfPublisher.settings.PdfPublisherProperties;
 import okhttp3.*;
 import okhttp3.RequestBody;
 import org.sonar.api.ce.posttask.PostProjectAnalysisTask;
-import org.sonar.api.ce.posttask.QualityGate;
 import org.sonar.api.utils.log.Logger;
 import org.sonar.api.utils.log.Loggers;
 
@@ -23,7 +22,7 @@ public class FileUploadController implements PostProjectAnalysisTask {
     }
 
     public void handleFileUpload(File file, PdfPublisherProperties destinationProperties) {
-        Response response = null;
+        Response response;
         try {
             OkHttpClient client = new OkHttpClient().newBuilder()
                     .build();
@@ -42,7 +41,6 @@ public class FileUploadController implements PostProjectAnalysisTask {
             Request request = pdfErrorManagement.publishPdfToPage(
                     PdfPublisherProperties.urlConfluenceBuilder(
                             destinationProperties.getHostnameConfluence(),
-                            destinationProperties.getPortConfluence(),
                             destinationProperties.getPageIdConfluence()),
                     body,
                     destinationProperties.getLoginConfluence(),
