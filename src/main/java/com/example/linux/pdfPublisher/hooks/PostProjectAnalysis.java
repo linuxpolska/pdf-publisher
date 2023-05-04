@@ -42,13 +42,6 @@ public class PostProjectAnalysis implements PostProjectAnalysisTask {
             pdfPublisherProperties.setProjectSonarQubeName(Optional.ofNullable(
                     context.getProjectAnalysis().getProject().getName()).map(Object::toString).get());
             // Branch Name
-            LOGGER.error("Poniżej jest nazwy Branchu trzeba ja sprawdzić");
-            LOGGER.info("Z valueOf");
-            LOGGER.info(String.valueOf(Optional.ofNullable(context.getProjectAnalysis().getBranch().get().getName())));
-            LOGGER.info("z map()");
-            LOGGER.info(Optional.ofNullable(context.getProjectAnalysis().getBranch().get().getName()).map(Object::toString)
-                    .orElse("PUSTO")); // TODO zamienic na null
-            // NULL
             pdfPublisherProperties.setBranchSonarQubeName(context.getProjectAnalysis().getBranch().get().getName().map(Object::toString).get());
 
 
@@ -75,11 +68,6 @@ public class PostProjectAnalysis implements PostProjectAnalysisTask {
                     Optional.ofNullable(configuration.getStringArray(PdfPublisherProperties.PDF_PUBLISHER_CONFLUENCE_HOSTNAME))
                             .get(), ","));
             LOGGER.info("Confluence Hostname " + pdfPublisherProperties.getHostnameConfluence());
-            // Port - Custom Example for archive purpose
-//            pdfPublisherProperties.setPortConfluence(convertStringArrayToString(
-//                    Optional.ofNullable(configuration.getStringArray(PdfPublisherProperties.PDF_PUBLISHER_CONFLUENCE_PORT))
-//                            .get(),","));
-//            LOGGER.info("Confluence Port "+ pdfPublisherProperties.getPortConfluence());
             // Login - Custom - Global
             pdfPublisherProperties.setLoginConfluence(convertStringArrayToString(
                     Optional.ofNullable(configuration.getStringArray(PdfPublisherProperties.PDF_PUBLISHER_CONFLUENCE_LOGIN))

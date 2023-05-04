@@ -287,8 +287,6 @@ public class PdfPublisherProperties {
                 .append(PdfPublisherProperties.SLASH)
                 .append(PdfPublisherProperties.CHILD_ATTACHMENT)
                 .toString();
-        LOGGER.info("Confluence url: ");
-        LOGGER.info(url);
         return url;
     }
 
@@ -311,8 +309,6 @@ public class PdfPublisherProperties {
                 .append(PdfPublisherProperties.EQUAL)
                 .append(PdfPublisherProperties.PDF_PUBLISHER_CONFLUENCE_PAGEID)
                 .toString();
-        LOGGER.info("SonarQube PageId url: ");
-        LOGGER.info(url);
         return url;
     }
 }
