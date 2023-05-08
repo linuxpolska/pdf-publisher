@@ -5,7 +5,7 @@
     <groupId>com.example.linux</groupId>
 	<artifactId>pdfPublisher</artifactId>
 	<packaging>sonar-plugin</packaging>
-	<version>1.0.1</version>
+	<version>1.0.2</version>
 
 	<name>pdfpublisher</name>
 	<description>Pdf plugin publisher</description>
