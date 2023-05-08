@@ -49,39 +49,39 @@ public class PostProjectAnalysis implements PostProjectAnalysisTask {
             pdfPublisherProperties.setHostnameSonarQube(convertStringArrayToString(
                     Optional.ofNullable(configuration.getStringArray(PdfPublisherProperties.PDF_PUBLISHER_SONARQUBE_HOSTNAME))
                             .get(), ","));
-            LOGGER.info("SonarQube Hostname " + pdfPublisherProperties.getHostnameSonarQube());
-            LOGGER.info(pdfPublisherProperties.getHostnameSonarQube());
+            // LOGGER.info("SonarQube Hostname " + pdfPublisherProperties.getHostnameSonarQube());
+            // LOGGER.info(pdfPublisherProperties.getHostnameSonarQube());
             // Login - Custom - Global
             pdfPublisherProperties.setLoginSonarQube(convertStringArrayToString(
                     Optional.ofNullable(configuration.getStringArray(PdfPublisherProperties.PDF_PUBLISHER_SONARQUBE_LOGIN))
                             .get(), ","));
-            LOGGER.info("SonarQube Login " + !pdfPublisherProperties.getLoginSonarQube().isEmpty());
+            // LOGGER.info("SonarQube Login " + !pdfPublisherProperties.getLoginSonarQube().isEmpty());
             // Password - Custom - Global
             pdfPublisherProperties.setPasswordSonarQube(convertStringArrayToString(
                     Optional.ofNullable(configuration.getStringArray(PdfPublisherProperties.PDF_PUBLISHER_SONARQUBE_PASSWORD))
                             .get(), ","));
-            LOGGER.info("SonarQube Password " + !pdfPublisherProperties.getPasswordSonarQube().isEmpty());
+            // LOGGER.info("SonarQube Password " + !pdfPublisherProperties.getPasswordSonarQube().isEmpty());
 
             // Destination section
             // Hostname - Custom - Global
             pdfPublisherProperties.setHostnameConfluence(convertStringArrayToString(
                     Optional.ofNullable(configuration.getStringArray(PdfPublisherProperties.PDF_PUBLISHER_CONFLUENCE_HOSTNAME))
                             .get(), ","));
-            LOGGER.info("Confluence Hostname " + pdfPublisherProperties.getHostnameConfluence());
+            // LOGGER.info("Confluence Hostname " + pdfPublisherProperties.getHostnameConfluence());
             // Login - Custom - Global
             pdfPublisherProperties.setLoginConfluence(convertStringArrayToString(
                     Optional.ofNullable(configuration.getStringArray(PdfPublisherProperties.PDF_PUBLISHER_CONFLUENCE_LOGIN))
                             .get(), ","));
-            LOGGER.info("Confluence Login " + !pdfPublisherProperties.getLoginConfluence().isEmpty());
+            // LOGGER.info("Confluence Login " + !pdfPublisherProperties.getLoginConfluence().isEmpty());
             // Password - Custom - Global
             pdfPublisherProperties.setPasswordConfluence(convertStringArrayToString(
                     Optional.ofNullable(configuration.getStringArray(PdfPublisherProperties.PDF_PUBLISHER_CONFLUENCE_PASSWORD))
                             .get(), ","));
-            LOGGER.info("Confluence Hostname " + !pdfPublisherProperties.getPasswordConfluence().isEmpty());
+            // LOGGER.info("Confluence Hostname " + !pdfPublisherProperties.getPasswordConfluence().isEmpty());
             // `PageId - Custom
             // http get
             pdfPublisherProperties.setPageIdConfluence(getPageIdFromApi());
-            LOGGER.info("Confluence PageId " + pdfPublisherProperties.getPageIdConfluence());
+            // LOGGER.info("Confluence PageId " + pdfPublisherProperties.getPageIdConfluence());
 
             // Destination section
             try {
@@ -104,14 +104,17 @@ public class PostProjectAnalysis implements PostProjectAnalysisTask {
                         .build();
                 Response response = client.newCall(request).execute();
                 ResponseBody body = response.body();
-                if (body != null) {
+                int statusCode = response.code();
+                if (body != null && statusCode < 400) {
 //                    LOGGER.info("Headers Content-Type is: " + response.headers().get("Content-Type"));
 //                    LOGGER.info("Body Content-Type is: " + response.body().contentType().toString());
                     if (body.contentType() != null &&
                             !body.contentType().toString().contains("multipart")) {
                         file = new File((pdfPublisherProperties.getProjectSonarQubeName()
+                                + "_"
+                                + pdfPublisherProperties.getBranchSonarQubeName()
                                 + PdfPublisherProperties.DOT_EXTENSION));
-                        LOGGER.info("File name is: " + file.getName());
+                        // LOGGER.info("File name is: " + file.getName());
                         OutputStream outStream = new FileOutputStream(file);
                         try {
                             outStream.write(body.bytes()); // Buffer
@@ -128,9 +131,11 @@ public class PostProjectAnalysis implements PostProjectAnalysisTask {
                     }
                 } else {
                     LOGGER.info("Response of " + pdfPublisherProperties.getHostnameSonarQube() + " is null!");
+                    response.close();
+                    return;
                 }
                 // Send a file to the fileUpload Controller
-                LOGGER.info("Uploader do Confluence page");
+                // LOGGER.info("Uploader do Confluence page");
                 FileUploadController fileUploadController = new FileUploadController();
                 fileUploadController.handleFileUpload(file, pdfPublisherProperties);
                 response.close();

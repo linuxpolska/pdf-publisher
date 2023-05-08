@@ -31,10 +31,10 @@ public class FileUploadController implements PostProjectAnalysisTask {
                             RequestBody.create(MediaType.parse(PdfPublisherProperties.APPLICATION_OCTET_STREAM),
                                     file))
                     .addFormDataPart(PdfPublisherProperties.MINOR_EDIT, PdfPublisherProperties.TRUE_TEXT)
-                    .addFormDataPart(PdfPublisherProperties.COMMENT, null,
-                            RequestBody.create(
-                                    MediaType.parse(PdfPublisherProperties.TEXT_PLAIN),
-                                    PdfPublisherProperties.COMMENT_BODY.getBytes()))
+                    // .addFormDataPart(PdfPublisherProperties.COMMENT, null,
+                    //         RequestBody.create(
+                    //                 MediaType.parse(PdfPublisherProperties.TEXT_PLAIN),
+                    //                 PdfPublisherProperties.COMMENT_BODY.getBytes()))
                     .build();
 
             PdfErrorManagement pdfErrorManagement = new PdfErrorManagement();
@@ -49,6 +49,7 @@ public class FileUploadController implements PostProjectAnalysisTask {
             LOGGER.info(response.body().toString());
             pdfErrorManagement.checkHttpStatus(response);
             LOGGER.warn(String.valueOf(response.code()));
+            response.close();
         } catch (NoSuchFileException noSuchFileException) {
             LOGGER.error(
                     PdfPublisherProperties.THE +
