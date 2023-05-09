@@ -10,6 +10,8 @@ import org.sonar.api.utils.log.Loggers;
 
 import java.io.*;
 import java.nio.file.NoSuchFileException;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.time.Clock;
 import java.time.Instant;
 
@@ -66,7 +68,9 @@ public class FileUploadController implements PostProjectAnalysisTask {
         }
     }
     private String generateFileName(String fileName) {
-        Instant currentTimeStamp = Clock.systemUTC().instant();
-        return currentTimeStamp + "_" + fileName.substring(0, 0) + fileName.substring(0);
+        Timestamp ts = Timestamp.from(Instant.now());
+        String s = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(ts);
+        return s.toString().replaceAll("\\s", "_") + "_" + fileName.substring(0, 0) +
+                fileName.substring(0);
     }
 }

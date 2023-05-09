@@ -5,7 +5,7 @@
     <groupId>com.example.linux</groupId>
 	<artifactId>pdfPublisher</artifactId>
 	<packaging>sonar-plugin</packaging>
-	<version>1.0.2</version>
+	<version>1.0.3</version>
 
 	<name>pdfpublisher</name>
 	<description>Pdf plugin publisher</description>
@@ -202,5 +202,13 @@
             </plugin>
 		</plugins>
 	</build>
+
+	<licenses>
+		<license>
+			<name>Apache License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
 
 </project>

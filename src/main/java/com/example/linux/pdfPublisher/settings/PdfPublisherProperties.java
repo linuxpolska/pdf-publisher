@@ -287,6 +287,8 @@ public class PdfPublisherProperties {
                 .append(PdfPublisherProperties.SLASH)
                 .append(PdfPublisherProperties.CHILD_ATTACHMENT)
                 .toString();
+        LOGGER.info("urlConfluenceBuilder");
+        LOGGER.info(url);
         return url;
     }
 
@@ -309,6 +311,8 @@ public class PdfPublisherProperties {
                 .append(PdfPublisherProperties.EQUAL)
                 .append(PdfPublisherProperties.PDF_PUBLISHER_CONFLUENCE_PAGEID)
                 .toString();
+        LOGGER.info("urlSourcePageIDBuilder");
+        LOGGER.info(url);
         return url;
     }
 }
