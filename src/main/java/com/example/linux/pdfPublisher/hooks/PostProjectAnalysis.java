@@ -13,7 +13,6 @@ import org.sonar.api.config.Configuration;
 import org.sonar.api.utils.log.Logger;
 import org.sonar.api.utils.log.Loggers;
 
-import java.awt.image.LookupOp;
 import java.io.*;
 import java.nio.file.NoSuchFileException;
 import java.util.NoSuchElementException;
@@ -132,7 +131,6 @@ public class PostProjectAnalysis implements PostProjectAnalysisTask {
                     return;
                 }
                 // Send a file to the fileUpload Controller
-                // LOGGER.info("Uploader do Confluence page");
                 FileUploadController fileUploadController = new FileUploadController();
                 fileUploadController.handleFileUpload(file, pdfPublisherProperties);
                 response.close();

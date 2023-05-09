@@ -33,10 +33,6 @@ public class FileUploadController implements PostProjectAnalysisTask {
                             RequestBody.create(MediaType.parse(PdfPublisherProperties.APPLICATION_OCTET_STREAM),
                                     file))
                     .addFormDataPart(PdfPublisherProperties.MINOR_EDIT, PdfPublisherProperties.TRUE_TEXT)
-                    // .addFormDataPart(PdfPublisherProperties.COMMENT, null,
-                    //         RequestBody.create(
-                    //                 MediaType.parse(PdfPublisherProperties.TEXT_PLAIN),
-                    //                 PdfPublisherProperties.COMMENT_BODY.getBytes()))
                     .build();
 
             PdfErrorManagement pdfErrorManagement = new PdfErrorManagement();
