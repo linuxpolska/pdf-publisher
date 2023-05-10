@@ -10,9 +10,10 @@ public class PdfPlugin implements Plugin {
 
     @Override
     public void define(Plugin.Context context) {
-        // tutorial on hooks
+        // Add hook PostProjectAnalysis
         context.addExtensions(Collections.singleton(PostProjectAnalysis.class));
-        // tutorial on settings
+        
+        // Add properties for plugin
         context.addExtensions(PdfPublisherProperties.getProperties());
     }
 }
