@@ -34,7 +34,7 @@ Compatibility matrix:
 ## Usage
 
 Installation:
-- download latest or required version from [https://github.com/linuxpolska/pdf-publisher/releases](here)
+- download latest or required version from (https://github.com/linuxpolska/pdf-publisher/releases)[here]
 - place jar file to your SonarQube Enterprise instance to ```[YOUR_SONAR_PATH]/extensions/plugins```
 - restart SonarQube Enterprise
 
