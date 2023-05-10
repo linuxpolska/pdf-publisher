@@ -22,7 +22,7 @@ Compatibility matrix:
 | SLF4J API Module | slf4j-api | MIT | [link](https://mvnrepository.com/artifact/org.slf4j/slf4j-api) |
 | JUnit | junit | EPL 1.0 | [link](https://mvnrepository.com/artifact/junit/junit) |
 | JSON.simple | json-simple | Apache 2.0 | [link](https://mvnrepository.com/artifact/com.googlecode.json-simple/json-simple) |
-| Unirest Java | unirest-java | MIT | [link](https://mvnrepository.com/artifact/com.mashape.unirest/unirest-java)) |
+| Unirest Java | unirest-java | MIT | [link](https://mvnrepository.com/artifact/com.mashape.unirest/unirest-java) |
 | Apache Commons Logging | commons-logging | Apache 2.0 | [link](https://mvnrepository.com/artifact/commons-logging/commons-logging) |
 | SonarQube :: Packaging Maven Plugin | sonar-packaging-maven-plugin | LGPL 3.0 | [link](https://mvnrepository.com/artifact/org.sonarsource.sonar-packaging-maven-plugin/sonar-packaging-maven-plugin) |
 | Apache Maven Compiler Plugin | maven-compiler-plugin | Apache 2.0 | [link](https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-compiler-plugin) |
