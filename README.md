@@ -16,7 +16,7 @@ Compatibility matrix:
 | Dependency Name | Library Name | Library License | Library URL |
 |-----------------|--------------|-----------------|--------------|
 | OkHttp	| okhttp | Apache 2.0 | [link](https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp) |
-| SonarQube | sonar-plugin-api | GNU General Public License (GPL) | [link](https://mvnrepository.com/artifact/org.sonarsource.sonarqube/sonar-plugin-api) |
+| SonarQube | sonar-plugin-api | LGPL 3.0 | [link](https://mvnrepository.com/artifact/org.sonarsource.sonarqube/sonar-plugin-api) |
 | Apache HttpClient | httpclient | Apache 2.0 | [link](https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient) | 
 | Apache Commons IO | commons-io maven | Apache 2.0 | [link](https://mvnrepository.com/artifact/commons-io/commons-io) |
 | SLF4J API Module | slf4j-api | MIT | [link](https://mvnrepository.com/artifact/org.slf4j/slf4j-api) |
