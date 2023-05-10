@@ -7,14 +7,14 @@ This plugin automatically pushes Security Reports from SonarQube to Confluence.
 
 Compatibility matrix:
 
-| Checkstyle Plugin | Sonar min | Sonar max | Jdk |
-|-------------------|-----------|-----------|-----|
-| 1.0.3             | 9.0       | 9.0+      | 17  |
+| Plugin | Sonar min | Sonar max | Jdk |
+|--------|-----------|-----------|-----|
+| 1.0.3  | 9.0       | 9.0+      | 17  |
 
 ## Dependencies
 
-| Dependency Name | Library Name | Librar License | Library URL |
-|-----------------|--------------|----------------|--------------|
+| Dependency Name | Library Name | Library License | Library URL |
+|-----------------|--------------|-----------------|--------------|
 | OkHttp	| okhttp | Apache 2.0 | https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp |
 | SonarQube | sonar-plugin-api | GNU General Public License (GPL) | https://mvnrepository.com/artifact/org.sonarsource.sonarqube/sonar-plugin-api |
 | Apache HttpClient | httpclient | Apache 2.0 | https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient | 
