@@ -1,9 +1,9 @@
 # pdf-publisher
-SonarQube Plugin - Publish PDF Security Reports to Confluence
+SonarQube Enterprise Plugin - Publish PDF Security Reports to Confluence
 
 ## Description / Features
 
-This plugin automatically pushes Security Reports from SonarQube to Confluence.
+This plugin automatically pushes Security Reports from SonarQube Enterprise to Confluence.
 
 Compatibility matrix:
 
@@ -33,8 +33,9 @@ Compatibility matrix:
 
 ## Usage
 
-Dowload latest or required version from https://github.com/linuxpolska/pdf-publisher/releases .
-Place jar file to your sonar instance to "[YOUR_SONAR_PATH]/extensions/plugins", restart Sonar.
+- download latest or required version from https://github.com/linuxpolska/pdf-publisher/releases
+- place jar file to your SonarQube Enterprise instance to ```[YOUR_SONAR_PATH]/extensions/plugins```
+- restart SonarQube Enterprise
 
 In Global Configuration fill in your SonarQube and Confluence URLs and credentials.
 
